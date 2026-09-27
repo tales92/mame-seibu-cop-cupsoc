@@ -15,11 +15,9 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout Seibu Cup Soccer source
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          repository: rmonic79/mame
-          ref: seibu-cop-cupsoc
           fetch-depth: 1
           submodules: recursive
 
