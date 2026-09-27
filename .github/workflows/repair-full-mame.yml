@@ -27,8 +27,7 @@ jobs:
           mkdir -p /tmp/mame-source
           tar -xzf /tmp/mame-archive.tar.gz --strip-components=1 -C /tmp/mame-source
           rm -rf /tmp/mame-source/.github
-          rm -rf .git
-          find . -mindepth 1 ! -path './.github' ! -path './.github/*' -exec rm -rf {} +
+          find . -mindepth 1 ! -path './.git' ! -path './.git/*' ! -path './.github' ! -path './.github/*' -exec rm -rf {} +
           cp -a /tmp/mame-source/. .
           cat > README.md <<'EOF'
           # MAME - Seibu Cup Soccer
@@ -39,10 +38,6 @@ jobs:
 
           This repository keeps the Seibu Cup Soccer COP corrections separate from the `tales92/libretro-mame` Arrange Audio project.
           EOF
-          git init
-          git remote add origin https://github.com/${GITHUB_REPOSITORY}.git
-          git fetch origin main --depth=1
-          git checkout -B main FETCH_HEAD
           git add -A
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
