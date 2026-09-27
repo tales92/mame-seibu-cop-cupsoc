@@ -27,8 +27,7 @@ jobs:
           mkdir -p /tmp/mame-source
           tar -xzf /tmp/mame-archive.tar.gz --strip-components=1 -C /tmp/mame-source
           rm -rf /tmp/mame-source/.github
-          find . -mindepth 1 ! -path './.git' ! -path './.git/*' ! -path './.github' ! -path './.github/*' -exec rm -rf {} +
-          cp -a /tmp/mame-source/. .
+          rsync -a --exclude='.github/' /tmp/mame-source/ ./
           cat > README.md <<'EOF'
           # MAME - Seibu Cup Soccer
 
