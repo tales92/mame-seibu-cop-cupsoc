@@ -44,7 +44,7 @@ jobs:
 
           This repository keeps the Seibu Cup Soccer COP corrections separate from the `tales92/libretro-mame` Arrange Audio project.
           EOF
-          git add -A
+          git add -A -f
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Restore complete MAME source tree" || true
