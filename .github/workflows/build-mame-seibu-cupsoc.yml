@@ -1,0 +1,71 @@
+name: Build MAME - Seibu Cup Soccer
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Seibu Cup Soccer source
+        uses: actions/checkout@v4
+        with:
+          repository: rmonic79/mame
+          ref: seibu-cop-cupsoc
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Set up MSYS2 UCRT64
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            git
+            make
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-gcc-libs
+            mingw-w64-ucrt-x86_64-python
+            mingw-w64-ucrt-x86_64-SDL3
+            mingw-w64-ucrt-x86_64-SDL3_ttf
+
+      - name: Build MAME
+        shell: msys2 {0}
+        run: |
+          set -e
+          export PATH="/ucrt64/bin:/usr/bin:$PATH"
+          make SUBTARGET=mame TOOLS=1 -j3
+
+      - name: Validate build
+        shell: msys2 {0}
+        run: |
+          set -e
+          ./mame.exe -validate
+          ./mame.exe -version > build-info.txt
+          echo "Source branch: rmonic79/mame:seibu-cop-cupsoc" >> build-info.txt
+          echo "Source commit: 84ef4b2f862b56563fc76a5e61341081b1123aa7" >> build-info.txt
+          echo "Build repository: tales92/mame-seibu-cop-cupsoc" >> build-info.txt
+
+      - name: Collect build artifacts
+        shell: msys2 {0}
+        run: |
+          set -e
+          mkdir -p artifacts
+          cp mame.exe artifacts/
+          if [ -f chdman.exe ]; then cp chdman.exe artifacts/; fi
+          if [ -f unidasm.exe ]; then cp unidasm.exe artifacts/; fi
+          cp build-info.txt artifacts/
+
+      - name: Upload MAME build
+        uses: actions/upload-artifact@v4
+        with:
+          name: mame-seibu-cop-cupsoc-windows
+          path: artifacts/
+          if-no-files-found: error
