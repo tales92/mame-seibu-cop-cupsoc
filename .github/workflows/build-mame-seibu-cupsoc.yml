@@ -26,22 +26,28 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           msystem: UCRT64
-          update: true
+          update: false
           install: >-
             git
             make
             mingw-w64-ucrt-x86_64-gcc
-            mingw-w64-ucrt-x86_64-gcc-libs
             mingw-w64-ucrt-x86_64-python
-            mingw-w64-ucrt-x86_64-SDL3
-            mingw-w64-ucrt-x86_64-SDL3_ttf
+            mingw-w64-ucrt-x86_64-lld
+            mingw-w64-ucrt-x86_64-llvm
+            mingw-w64-ucrt-x86_64-libc++
+            mingw-w64-ucrt-x86_64-sdl3
 
       - name: Build MAME
         shell: msys2 {0}
-        run: |
-          set -e
-          export PATH="/ucrt64/bin:/usr/bin:$PATH"
-          make SUBTARGET=mame TOOLS=1 -j3
+        env:
+          OVERRIDE_AR: llvm-ar
+          OVERRIDE_CC: gcc
+          OVERRIDE_CXX: g++
+          ARCHOPTS: -fuse-ld=lld
+          SUBTARGET: mame
+          TOOLS: 1
+          USE_SDL3: 1
+        run: make -j3
 
       - name: Validate build
         shell: msys2 {0}
