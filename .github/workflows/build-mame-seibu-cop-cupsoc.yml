@@ -2,6 +2,9 @@ name: Build MAME - Seibu Cup Soccer
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 permissions:
   contents: read
