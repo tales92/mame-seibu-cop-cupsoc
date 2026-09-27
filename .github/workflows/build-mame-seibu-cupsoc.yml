@@ -20,7 +20,7 @@ jobs:
         with:
           repository: rmonic79/mame
           ref: seibu-cop-cupsoc
-          fetch-depth: 0
+          fetch-depth: 1
           submodules: recursive
 
       - name: Set up MSYS2 UCRT64
