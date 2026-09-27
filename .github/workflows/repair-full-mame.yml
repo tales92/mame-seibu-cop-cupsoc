@@ -1,0 +1,50 @@
+name: Repair full MAME tree
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  repair-tree:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Restore every tracked upstream file
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/mame-source /tmp/mame-archive.tar.gz
+          curl -L --fail --retry 3 https://github.com/rmonic79/mame/archive/84ef4b2f862b56563fc76a5e61341081b1123aa7.tar.gz -o /tmp/mame-archive.tar.gz
+          mkdir -p /tmp/mame-source
+          tar -xzf /tmp/mame-archive.tar.gz --strip-components=1 -C /tmp/mame-source
+          rm -rf /tmp/mame-source/.github
+          rm -rf .git
+          find . -mindepth 1 ! -path './.github' ! -path './.github/*' -exec rm -rf {} +
+          cp -a /tmp/mame-source/. .
+          cat > README.md <<'EOF'
+          # MAME - Seibu Cup Soccer
+
+          Independent MAME source repository based on `rmonic79/mame` branch `seibu-cop-cupsoc`.
+
+          Source commit: `84ef4b2f862b56563fc76a5e61341081b1123aa7`.
+
+          This repository keeps the Seibu Cup Soccer COP corrections separate from the `tales92/libretro-mame` Arrange Audio project.
+          EOF
+          git init
+          git remote add origin https://github.com/${GITHUB_REPOSITORY}.git
+          git fetch origin main --depth=1
+          git checkout -B main FETCH_HEAD
+          git add -A
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Repair and complete imported MAME source" || true
+          git push origin HEAD:main --force
