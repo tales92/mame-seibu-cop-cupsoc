@@ -34,6 +34,7 @@ jobs:
             mingw-w64-ucrt-x86_64-llvm
             mingw-w64-ucrt-x86_64-libc++
             mingw-w64-ucrt-x86_64-sdl3
+            mingw-w64-ucrt-x86_64-libiconv
 
       - name: Build MAME
         shell: msys2 {0}
@@ -45,6 +46,7 @@ jobs:
           SUBTARGET: mame
           TOOLS: 1
           USE_SDL3: 1
+          LDOPTS: -liconv
         run: make -j3
 
       - name: Validate build
